@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>gtsam_catkin_example_project</name>
+  <version>0.0.0</version>
+  <description>Example for gtsam_catkin.</description>
+
+  <maintainer email="nubertj@ethz.ch">Julian Nubert</maintainer>
+  <license>BSD-3-Clause</license>
+  <author email="nubertj@ethz.ch">Julian Nubert</author>
+
+  <buildtool_depend>catkin</buildtool_depend>
+  <depend>gtsam_catkin</depend>
+
+</package>
