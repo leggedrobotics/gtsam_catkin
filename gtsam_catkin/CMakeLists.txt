@@ -62,11 +62,11 @@ if (DEFINED ENV{GTSAM_DIR})
 
     # 2 - Check whether GTSAM is installed -------------------------------------------------------
 elseif (GTSAM_FOUND)
-    message("${BoldMagenta}INFO: Found GTSA installationM.${ColourReset}")
+    message("${BoldMagenta}INFO: Found GTSAM installationM.${ColourReset}")
 
     message("GTSAM include path: ${GTSAM_INCLUDE_DIR}")
     message("GTSAM libs: ${GTSAM_LIBRARY_DIR}")
-    
+
     catkin_package(
             CATKIN_DEPENDS ${CATKIN_PACKAGE_DEPENDENCIES}
             DEPENDS GTSAM
