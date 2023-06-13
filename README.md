@@ -22,7 +22,7 @@ For an example on how to build GTSAM (locally) on your system, refer to [this li
 ### 2.0 - Requirements
 No additional requirements known at this point.
 
-## 2.1 - GTSAM_catkin Compilation
+### 2.1 - GTSAM_catkin Compilation
 Compilation of *GTSAM_catkin* is really straightforward.
 Make sure you have a catkin workspace with this repository:
 ```bash
