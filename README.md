@@ -76,7 +76,7 @@ An example of this can be seen in [./gtsam_catkin_example_project/CMakeLists.txt
 
 You can also build it by running:
 ```bash
-catkin build GTSAM_catkin_example_project
+catkin build gtsam_catkin_example_project
 ```
 
 ### Code Usage
