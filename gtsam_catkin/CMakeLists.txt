@@ -22,39 +22,66 @@ if (NOT WIN32)
     set(Magenta "${Esc}[35m")
 endif ()
 
+# Code snippet taken from catkin_simple: https://github.com/catkin/catkin_simple/blob/master/cmake/catkin_simple-extras.cmake.em
+macro(get_run_deps)
+    cmake_parse_arguments(CS_PROJECT
+            "" "" "INCLUDE_DIRS;LIBRARIES;CATKIN_DEPENDS;DEPENDS;CFG_EXTRAS"
+            ${ARGN})
+
+    set(${PROJECT_NAME}_CATKIN_RUN_DEPENDS)
+    foreach (dep ${${PROJECT_NAME}_RUN_DEPENDS})
+        find_package(${dep} QUIET)
+        if (${dep}_FOUND_CATKIN_PROJECT)
+            list(APPEND ${PROJECT_NAME}_CATKIN_RUN_DEPENDS ${dep})
+        endif ()
+    endforeach ()
+
+endmacro()
+
+get_run_deps(INCLUDE_DIRS ${CATKIN_DEVEL_PREFIX}/include
+        LIBRARIES tbb
+        )
+
 # 1 - Check whether variable is set -----------------------------------------------------------
 if (DEFINED ENV{GTSAM_DIR})
+    message("${BoldMagenta}INFO: Found manually set path to GTSAM. Using version located at $ENV{GTSAM_DIR}.${ColourReset}")
+
     set(GTSAM_DIR ENV{GTSAM_DIR})
     find_package(GTSAM CONFIG REQUIRED)
-    message("${BoldMagenta}INFO: Found manually set path to GTSAM. Using version located at $ENV{GTSAM_DIR}.${ColourReset}")
-    set(GTSAM_INCLUDE_DIR_MAN "${GTSAM_DIR}/../../../include/")
-    message("GTSAM include path: ${GTSAM_INCLUDE_DIRS} , ${GTSAM_INCLUDE_DIR_MAN}")
-    message("GTSAM libs: ${GTSAM_LIBRARIES}")
+    message("GTSAM include path: ${GTSAM_INCLUDE_DIR}")
+    message("GTSAM libs: ${GTSAM_LIBRARY_DIR}")
+
     catkin_package(
-            INCLUDE_DIRS
-            ${GTSAM_INCLUDE_DIRS}
-            ${GTSAM_INCLUDE_DIR_MAN}
+            CATKIN_DEPENDS ${CATKIN_PACKAGE_DEPENDENCIES}
+            DEPENDS GTSAM
+            INCLUDE_DIRS ${GTSAM_INCLUDE_DIR}
             LIBRARIES
-            ${GTSAM_LIBRARIES}
-            CATKIN_DEPENDS
-            ${CATKIN_PACKAGE_DEPENDENCIES}
-            DEPENDS
-            GTSAM
+            gtsam gtsam_unstable
+            ${CS_PROJECT_LIBRARIES}
     )
 
     # 2 - Check whether GTSAM is installed -------------------------------------------------------
 elseif (GTSAM_FOUND)
-    message("${BoldMagenta}INFO: Found GTSAM.${ColourReset}")
+    message("${BoldMagenta}INFO: Found GTSA installationM.${ColourReset}")
+
+    message("GTSAM include path: ${GTSAM_INCLUDE_DIR}")
+    message("GTSAM libs: ${GTSAM_LIBRARY_DIR}")
+    
+    catkin_package(
+            CATKIN_DEPENDS ${CATKIN_PACKAGE_DEPENDENCIES}
+            DEPENDS GTSAM
+            INCLUDE_DIRS ${GTSAM_INCLUDE_DIR}
+            LIBRARIES
+            gtsam gtsam_unstable
+            ${CS_PROJECT_LIBRARIES}
+    )
 
     # Path differs whether installed from PPA or (locally) from source
-    if (EXISTS "${GTSAM_DIR}/../../../../include/")
-        set(GTSAM_INCLUDE_DIR_MAN "${GTSAM_DIR}/../../../../include/")
-    else ()
-        set(GTSAM_INCLUDE_DIR_MAN "${GTSAM_DIR}/../../../include/")
-    endif ()
-
-    message("GTSAM libraries: ${GTSAM_LIBRARIES}")
-    message("GTSAM include path: ${GTSAM_INCLUDE_DIRS} , ${GTSAM_INCLUDE_DIR_MAN}")
+#    if (EXISTS "${GTSAM_DIR}/../../../../include/")
+#        set(GTSAM_INCLUDE_DIR_MAN "${GTSAM_DIR}/../../../../include/")
+#    else ()
+#        set(GTSAM_INCLUDE_DIR_MAN "${GTSAM_DIR}/../../../include/")
+#    endif ()
 
     # 3 - Compile in catkin workspace -------------------------------------------------------------
 else ()
@@ -100,27 +127,6 @@ else ()
 
     install(DIRECTORY ${CATKIN_DEVEL_PREFIX}/lib/
             DESTINATION ${CATKIN_GLOBAL_LIB_DESTINATION}
-            )
-
-    # Code snippet taken from catkin_simple: https://github.com/catkin/catkin_simple/blob/master/cmake/catkin_simple-extras.cmake.em
-    macro(get_run_deps)
-        cmake_parse_arguments(CS_PROJECT
-                "" "" "INCLUDE_DIRS;LIBRARIES;CATKIN_DEPENDS;DEPENDS;CFG_EXTRAS"
-                ${ARGN})
-
-        set(${PROJECT_NAME}_CATKIN_RUN_DEPENDS)
-        foreach (dep ${${PROJECT_NAME}_RUN_DEPENDS})
-            find_package(${dep} QUIET)
-            if (${dep}_FOUND_CATKIN_PROJECT)
-                list(APPEND ${PROJECT_NAME}_CATKIN_RUN_DEPENDS ${dep})
-            endif ()
-        endforeach ()
-
-    endmacro()
-
-    get_run_deps(INCLUDE_DIRS ${CATKIN_DEVEL_PREFIX}/include
-            LIBRARIES
-            tbb
             )
 
     # Final catkin package --------------------------------------------------
