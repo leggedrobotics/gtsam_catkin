@@ -11,7 +11,7 @@ find_package(catkin REQUIRED COMPONENTS
         )
 
 # Check whether gtsam can be found
-find_package(gtsam QUIET)
+find_package(GTSAM QUIET)
 find_package(Eigen3 REQUIRED)
 
 # Color
@@ -23,51 +23,51 @@ if (NOT WIN32)
 endif ()
 
 # 1 - Check whether variable is set -----------------------------------------------------------
-if (DEFINED ENV{gtsam_DIR})
-    set(gtsam_DIR ENV{gtsam_DIR})
-    find_package(gtsam CONFIG REQUIRED)
-    message("${BoldMagenta}INFO: Found manually set path to gtsam. Using version located at $ENV{gtsam_DIR}.${ColourReset}")
-    set(gtsam_INCLUDE_DIR_MAN "${gtsam_DIR}/../../../include/")
-    message("gtsam include path: ${gtsam_INCLUDE_DIRS} , ${gtsam_INCLUDE_DIR_MAN}")
-    message("gtsam libs: ${gtsam_LIBRARIES}")
+if (DEFINED ENV{GTSAM_DIR})
+    set(GTSAM_DIR ENV{GTSAM_DIR})
+    find_package(GTSAM CONFIG REQUIRED)
+    message("${BoldMagenta}INFO: Found manually set path to GTSAM. Using version located at $ENV{GTSAM_DIR}.${ColourReset}")
+    set(GTSAM_INCLUDE_DIR_MAN "${GTSAM_DIR}/../../../include/")
+    message("GTSAM include path: ${GTSAM_INCLUDE_DIRS} , ${GTSAM_INCLUDE_DIR_MAN}")
+    message("GTSAM libs: ${GTSAM_LIBRARIES}")
     catkin_package(
             INCLUDE_DIRS
-            ${gtsam_INCLUDE_DIRS}
-            ${gtsam_INCLUDE_DIR_MAN}
+            ${GTSAM_INCLUDE_DIRS}
+            ${GTSAM_INCLUDE_DIR_MAN}
             LIBRARIES
-            ${gtsam_LIBRARIES}
+            ${GTSAM_LIBRARIES}
             CATKIN_DEPENDS
             ${CATKIN_PACKAGE_DEPENDENCIES}
             DEPENDS
-            gtsam
+            GTSAM
     )
 
-    # 2 - Check whether gtsam is installed -------------------------------------------------------
-elseif (gtsam_FOUND)
-    message("${BoldMagenta}INFO: Found gtsam.${ColourReset}")
+    # 2 - Check whether GTSAM is installed -------------------------------------------------------
+elseif (GTSAM_FOUND)
+    message("${BoldMagenta}INFO: Found GTSAM.${ColourReset}")
 
     # Path differs whether installed from PPA or (locally) from source
-    if (EXISTS "${gtsam_DIR}/../../../../include/")
-        set(gtsam_INCLUDE_DIR_MAN "${gtsam_DIR}/../../../../include/")
+    if (EXISTS "${GTSAM_DIR}/../../../../include/")
+        set(GTSAM_INCLUDE_DIR_MAN "${GTSAM_DIR}/../../../../include/")
     else ()
-        set(gtsam_INCLUDE_DIR_MAN "${gtsam_DIR}/../../../include/")
+        set(GTSAM_INCLUDE_DIR_MAN "${GTSAM_DIR}/../../../include/")
     endif ()
 
-    message("gtsam libraries: ${gtsam_LIBRARIES}")
-    message("gtsam include path: ${gtsam_INCLUDE_DIRS} , ${gtsam_INCLUDE_DIR_MAN}")
+    message("GTSAM libraries: ${GTSAM_LIBRARIES}")
+    message("GTSAM include path: ${GTSAM_INCLUDE_DIRS} , ${GTSAM_INCLUDE_DIR_MAN}")
 
     # 3 - Compile in catkin workspace -------------------------------------------------------------
 else ()
-    message("${BoldMagenta}INFO: Neither variable gtsam_DIR is set, nor could gtsam be found, hence compiling in workspace.${ColourReset}")
+    message("${BoldMagenta}INFO: Neither variable GTSAM_DIR is set, nor could GTSAM be found, hence compiling in workspace.${ColourReset}")
 
     # Newer version of CMake is required
     cmake_minimum_required(VERSION 3.18)
 
-    # Catkinization of gtsam
+    # Catkinization of GTSAM
     include(ExternalProject)
     file(MAKE_DIRECTORY ${CATKIN_DEVEL_PREFIX}/include)
 
-    ExternalProject_Add(gtsam
+    ExternalProject_Add(GTSAM
             GIT_REPOSITORY "https://github.com/leggedrobotics/gtsam_fork.git"
             GIT_TAG "gtsam_rsl"
             GIT_SUBMODULES_RECURSE "true"
@@ -88,7 +88,7 @@ else ()
             )
 
     # Dependencies ---------------------------------------------------------
-    add_dependencies(gtsam ${catkin_EXPORTED_TARGETS} ${${PROJECT_NAME}_EXPORTED_TARGETS})
+    add_dependencies(GTSAM ${catkin_EXPORTED_TARGETS} ${${PROJECT_NAME}_EXPORTED_TARGETS})
 
     #############
     ## INSTALL ##
