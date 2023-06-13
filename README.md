@@ -72,7 +72,7 @@ target_link_libraries(${PROJECT_NAME}
 
 ```
 
-An example of this can be seen in [./gtsam_catkin_example_project/CMakeLists.txt](https://github.com/leggedrobotics/gtsam_catkin/gtsam_catkin_example_project/CMakeLists.txt).
+An example of this can be seen in [./gtsam_catkin_example_project/CMakeLists.txt](https://github.com/leggedrobotics/gtsam_catkin/blob/main/gtsam_catkin_example_project/CMakeLists.txt).
 
 You can also build it by running:
 ```bash
