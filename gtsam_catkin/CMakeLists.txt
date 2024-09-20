@@ -88,16 +88,15 @@ else ()
     message("${BoldMagenta}INFO: Neither variable GTSAM_DIR is set, nor could GTSAM be found, hence compiling in workspace.${ColourReset}")
 
     # Newer version of CMake is required
-    cmake_minimum_required(VERSION 3.18)
+    # cmake_minimum_required(VERSION 3.18)
 
     # Catkinization of GTSAM
     include(ExternalProject)
     file(MAKE_DIRECTORY ${CATKIN_DEVEL_PREFIX}/include)
 
     ExternalProject_Add(GTSAM
-            GIT_REPOSITORY "https://github.com/leggedrobotics/gtsam_fork.git"
-            GIT_TAG "gtsam_rsl"
-            GIT_SUBMODULES_RECURSE "true"
+            GIT_REPOSITORY "https://github.com/borglab/gtsam.git"
+            GIT_TAG "4.2a9"
             GIT_PROGRESS "true"
             CMAKE_CACHE_ARGS "-DCMAKE_POSITION_INDEPENDENT_CODE:BOOL=true"
             PREFIX "${CMAKE_SOURCE_DIR}"
