@@ -4,11 +4,11 @@ project(gtsam_catkin)
 find_package(catkin REQUIRED)
 
 set(CATKIN_PACKAGE_DEPENDENCIES
-        )
+)
 
 find_package(catkin REQUIRED COMPONENTS
         ${CATKIN_PACKAGE_DEPENDENCIES}
-        )
+)
 
 # Check whether gtsam can be found
 find_package(GTSAM QUIET)
@@ -40,7 +40,7 @@ endmacro()
 
 get_run_deps(INCLUDE_DIRS ${CATKIN_DEVEL_PREFIX}/include
         LIBRARIES tbb
-        )
+)
 
 # 1 - Check whether variable is set -----------------------------------------------------------
 if (DEFINED ENV{GTSAM_DIR})
@@ -77,11 +77,11 @@ elseif (GTSAM_FOUND)
     )
 
     # Path differs whether installed from PPA or (locally) from source
-#    if (EXISTS "${GTSAM_DIR}/../../../../include/")
-#        set(GTSAM_INCLUDE_DIR_MAN "${GTSAM_DIR}/../../../../include/")
-#    else ()
-#        set(GTSAM_INCLUDE_DIR_MAN "${GTSAM_DIR}/../../../include/")
-#    endif ()
+    #    if (EXISTS "${GTSAM_DIR}/../../../../include/")
+    #        set(GTSAM_INCLUDE_DIR_MAN "${GTSAM_DIR}/../../../../include/")
+    #    else ()
+    #        set(GTSAM_INCLUDE_DIR_MAN "${GTSAM_DIR}/../../../include/")
+    #    endif ()
 
     # 3 - Compile in catkin workspace -------------------------------------------------------------
 else ()
@@ -94,7 +94,11 @@ else ()
     include(ExternalProject)
     file(MAKE_DIRECTORY ${CATKIN_DEVEL_PREFIX}/include)
 
-    ExternalProject_Add(GTSAM
+    # Config
+    add_compile_options(-march=native)
+
+    # Actual compilation
+    ExternalProject_Add(gtsam_catkin
             GIT_REPOSITORY "https://github.com/borglab/gtsam.git"
             GIT_TAG "4.2a9"
             GIT_PROGRESS "true"
@@ -108,13 +112,13 @@ else ()
             -DGTSAM_ROT3_EXPMAP=ON
             -DGTSAM_USE_QUATERNIONS=ON
             -DGTSAM_USE_SYSTEM_EIGEN=ON
-            -DGTSAM_BUILD_WITH_MARCH_NATIVE=OFF
+            -DGTSAM_BUILD_WITH_MARCH_NATIVE=ON
             -DCMAKE_INSTALL_PREFIX=${CATKIN_DEVEL_PREFIX}
             INSTALL_COMMAND make install
-            )
+    )
 
     # Dependencies ---------------------------------------------------------
-    add_dependencies(GTSAM ${catkin_EXPORTED_TARGETS} ${${PROJECT_NAME}_EXPORTED_TARGETS})
+    add_dependencies(gtsam_catkin ${catkin_EXPORTED_TARGETS} ${${PROJECT_NAME}_EXPORTED_TARGETS})
 
     #############
     ## INSTALL ##
@@ -122,11 +126,11 @@ else ()
 
     install(DIRECTORY ${CATKIN_DEVEL_PREFIX}/include/
             DESTINATION ${CATKIN_GLOBAL_INCLUDE_DESTINATION}
-            )
+    )
 
     install(DIRECTORY ${CATKIN_DEVEL_PREFIX}/lib/
             DESTINATION ${CATKIN_GLOBAL_LIB_DESTINATION}
-            )
+    )
 
     # Final catkin package --------------------------------------------------
     catkin_package(
@@ -140,6 +144,8 @@ else ()
             CATKIN_DEPENDS
             ${${PROJECT_NAME}_CATKIN_RUN_DEPENDS}
             ${CATKIN_PACKAGE_DEPENDENCIES}
+            CFG_EXTRAS
+            export_compile_flags.cmake
     )
 
 endif ()
