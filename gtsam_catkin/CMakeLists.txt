@@ -99,9 +99,9 @@ else ()
             GIT_TAG "4.2a9"
             GIT_PROGRESS "true"
             CMAKE_CACHE_ARGS "-DCMAKE_POSITION_INDEPENDENT_CODE:BOOL=true"
-            PREFIX "${CMAKE_SOURCE_DIR}"
-            SOURCE_DIR "${CMAKE_SOURCE_DIR}/gtsam"
-            BINARY_DIR "${CMAKE_SOURCE_DIR}/tmp"
+            PREFIX "${CMAKE_BINARY_DIR}/gtsam_external"
+            SOURCE_DIR "${CMAKE_BINARY_DIR}/gtsam_external/src/gtsam"
+            BINARY_DIR "${CMAKE_BINARY_DIR}/gtsam_external/build"
             CMAKE_ARGS
             -DCMAKE_BUILD_TYPE=Release
             -DGTSAM_POSE3_EXPMAP=ON
