@@ -13,6 +13,7 @@ find_package(catkin REQUIRED COMPONENTS
 # Check whether gtsam can be found
 find_package(GTSAM QUIET)
 find_package(Eigen3 REQUIRED)
+find_package(TBB REQUIRED COMPONENTS tbb tbbmalloc)
 
 # Color
 if (NOT WIN32)
@@ -48,6 +49,7 @@ if (DEFINED ENV{GTSAM_DIR})
 
     set(GTSAM_DIR ENV{GTSAM_DIR})
     find_package(GTSAM CONFIG REQUIRED)
+    set(GTSAM_INCLUDE_DIRS ${GTSAM_INCLUDE_DIR})
     message("GTSAM include path: ${GTSAM_INCLUDE_DIR}")
     message("GTSAM libs: ${GTSAM_LIBRARY_DIR}")
 
@@ -62,6 +64,7 @@ if (DEFINED ENV{GTSAM_DIR})
 
     # 2 - Check whether GTSAM is installed -------------------------------------------------------
 elseif (GTSAM_FOUND)
+    set(GTSAM_INCLUDE_DIRS ${GTSAM_INCLUDE_DIR})
     message("${BoldMagenta}INFO: Found GTSAM installation.${ColourReset}")
 
     message("GTSAM include path: ${GTSAM_INCLUDE_DIR}")
@@ -96,19 +99,24 @@ else ()
 
     ExternalProject_Add(GTSAM
             GIT_REPOSITORY "https://github.com/borglab/gtsam.git"
-            GIT_TAG "4.2a9"
+            GIT_TAG "4.2.0"
             GIT_PROGRESS "true"
             CMAKE_CACHE_ARGS "-DCMAKE_POSITION_INDEPENDENT_CODE:BOOL=true"
             PREFIX "${CMAKE_BINARY_DIR}/gtsam_external"
             SOURCE_DIR "${CMAKE_BINARY_DIR}/gtsam_external/src/gtsam"
             BINARY_DIR "${CMAKE_BINARY_DIR}/gtsam_external/build"
             CMAKE_ARGS
+            -DCMAKE_CXX_FLAGS="-O3"
+            -DCMAKE_C_FLAGS="-O3"
             -DCMAKE_BUILD_TYPE=Release
+            -DTBB_ROOT=/usr
+            -DGTSAM_WITH_TBB=ON
             -DGTSAM_POSE3_EXPMAP=ON
             -DGTSAM_ROT3_EXPMAP=ON
             -DGTSAM_USE_QUATERNIONS=ON
             -DGTSAM_USE_SYSTEM_EIGEN=ON
             -DGTSAM_BUILD_WITH_MARCH_NATIVE=OFF
+            -DCMAKE_POSITION_INDEPENDENT_CODE=ON
             -DCMAKE_INSTALL_PREFIX=${CATKIN_DEVEL_PREFIX}
             INSTALL_COMMAND make install
             )
