@@ -95,14 +95,15 @@ else ()
     file(MAKE_DIRECTORY ${CATKIN_DEVEL_PREFIX}/include)
 
     ExternalProject_Add(GTSAM
-            GIT_REPOSITORY "https://github.com/borglab/gtsam.git"
-            GIT_TAG "4.2a9"
-            GIT_PROGRESS "true"
-            CMAKE_CACHE_ARGS "-DCMAKE_POSITION_INDEPENDENT_CODE:BOOL=true"
-            PREFIX "${CMAKE_BINARY_DIR}/gtsam_external"
-            SOURCE_DIR "${CMAKE_BINARY_DIR}/gtsam_external/src/gtsam"
-            BINARY_DIR "${CMAKE_BINARY_DIR}/gtsam_external/build"
-            CMAKE_ARGS
+        GIT_REPOSITORY "https://github.com/borglab/gtsam.git"
+        GIT_TAG "4.2a9"
+        GIT_PROGRESS "true"
+        PREFIX      "${CMAKE_SOURCE_DIR}"
+        TMP_DIR     "${CMAKE_BINARY_DIR}/gtsam/tmp"
+        BINARY_DIR  "${CMAKE_BINARY_DIR}/gtsam/build"
+        INSTALL_DIR "${CATKIN_DEVEL_PREFIX}"
+        CMAKE_CACHE_ARGS "-DCMAKE_POSITION_INDEPENDENT_CODE:BOOL=true"
+        CMAKE_ARGS
             -DCMAKE_BUILD_TYPE=Release
             -DGTSAM_POSE3_EXPMAP=ON
             -DGTSAM_ROT3_EXPMAP=ON
@@ -110,8 +111,7 @@ else ()
             -DGTSAM_USE_SYSTEM_EIGEN=ON
             -DGTSAM_BUILD_WITH_MARCH_NATIVE=OFF
             -DCMAKE_INSTALL_PREFIX=${CATKIN_DEVEL_PREFIX}
-            INSTALL_COMMAND make install
-            )
+    )
 
     # Dependencies ---------------------------------------------------------
     add_dependencies(GTSAM ${catkin_EXPORTED_TARGETS} ${${PROJECT_NAME}_EXPORTED_TARGETS})
