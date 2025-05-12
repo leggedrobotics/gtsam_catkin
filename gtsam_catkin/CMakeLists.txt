@@ -37,12 +37,9 @@ macro(get_run_deps)
             list(APPEND ${PROJECT_NAME}_CATKIN_RUN_DEPENDS ${dep})
         endif ()
     endforeach ()
-
 endmacro()
 
-get_run_deps(INCLUDE_DIRS ${CATKIN_DEVEL_PREFIX}/include
-        LIBRARIES tbb
-        )
+get_run_deps(INCLUDE_DIRS ${CATKIN_DEVEL_PREFIX}/include LIBRARIES tbb)
 
 # 1 - Check whether variable is set -----------------------------------------------------------
 if (DEFINED ENV{GTSAM_DIR})
@@ -54,43 +51,40 @@ if (DEFINED ENV{GTSAM_DIR})
     message("GTSAM libs: ${GTSAM_LIBRARY_DIR}")
 
     catkin_package(
-            CATKIN_DEPENDS ${CATKIN_PACKAGE_DEPENDENCIES}
-            DEPENDS GTSAM
-            INCLUDE_DIRS ${GTSAM_INCLUDE_DIR}
-            LIBRARIES
-            gtsam gtsam_unstable
+        INCLUDE_DIRS
+            ${GTSAM_INCLUDE_DIR}
+        LIBRARIES
+            gtsam
+            gtsam_unstable
+            metis-gtsam
             ${CS_PROJECT_LIBRARIES}
+        CATKIN_DEPENDS
+            ${CATKIN_PACKAGE_DEPENDENCIES}
+            ${${PROJECT_NAME}_CATKIN_RUN_DEPENDS}
+        DEPENDS GTSAM
     )
-
-    # 2 - Check whether GTSAM is installed -------------------------------------------------------
+# 2 - Check whether GTSAM is installed -------------------------------------------------------
 elseif (GTSAM_FOUND)
     message("${BoldMagenta}INFO: Found GTSAM installation.${ColourReset}")
 
-    message("GTSAM include path: ${GTSAM_INCLUDE_DIR}")
-    message("GTSAM libs: ${GTSAM_LIBRARY_DIR}")
+    find_package(GTSAM_UNSTABLE REQUIRED)
 
     catkin_package(
-            CATKIN_DEPENDS ${CATKIN_PACKAGE_DEPENDENCIES}
-            DEPENDS GTSAM
-            INCLUDE_DIRS ${GTSAM_INCLUDE_DIR}
-            LIBRARIES
-            gtsam gtsam_unstable
+        INCLUDE_DIRS
+            ${GTSAM_INCLUDE_DIR}
+        LIBRARIES
+            gtsam
+            gtsam_unstable
+            metis-gtsam
             ${CS_PROJECT_LIBRARIES}
+        CATKIN_DEPENDS
+            ${CATKIN_PACKAGE_DEPENDENCIES}
+            ${${PROJECT_NAME}_CATKIN_RUN_DEPENDS}
+        DEPENDS GTSAM
     )
-
-    # Path differs whether installed from PPA or (locally) from source
-#    if (EXISTS "${GTSAM_DIR}/../../../../include/")
-#        set(GTSAM_INCLUDE_DIR_MAN "${GTSAM_DIR}/../../../../include/")
-#    else ()
-#        set(GTSAM_INCLUDE_DIR_MAN "${GTSAM_DIR}/../../../include/")
-#    endif ()
-
-    # 3 - Compile in catkin workspace -------------------------------------------------------------
+# 3 - Compile in catkin workspace -------------------------------------------------------------
 else ()
     message("${BoldMagenta}INFO: Neither variable GTSAM_DIR is set, nor could GTSAM be found, hence compiling in workspace.${ColourReset}")
-
-    # Newer version of CMake is required
-    # cmake_minimum_required(VERSION 3.18)
 
     # Catkinization of GTSAM
     include(ExternalProject)
@@ -132,14 +126,14 @@ else ()
 
     # Final catkin package --------------------------------------------------
     catkin_package(
-            INCLUDE_DIRS
+        INCLUDE_DIRS
             ${CATKIN_DEVEL_PREFIX}/include
-            LIBRARIES
+        LIBRARIES
             ${CATKIN_DEVEL_PREFIX}/lib/libgtsam.so
             ${CATKIN_DEVEL_PREFIX}/lib/libgtsam_unstable.so
             ${CATKIN_DEVEL_PREFIX}/lib/libmetis-gtsam.so
             ${CS_PROJECT_LIBRARIES}
-            CATKIN_DEPENDS
+        CATKIN_DEPENDS
             ${${PROJECT_NAME}_CATKIN_RUN_DEPENDS}
             ${CATKIN_PACKAGE_DEPENDENCIES}
     )
