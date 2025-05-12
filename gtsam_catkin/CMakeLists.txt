@@ -43,7 +43,7 @@ get_run_deps(INCLUDE_DIRS ${CATKIN_DEVEL_PREFIX}/include LIBRARIES tbb)
 
 # 1 - Check whether variable is set -----------------------------------------------------------
 if (DEFINED ENV{GTSAM_DIR})
-    message("${BoldMagenta}INFO: Found manually set path to GTSAM. Using version located at $ENV{GTSAM_DIR}.${ColourReset}")
+    message("${BoldMagenta}INFO: Found GTSAM via environment variable at $ENV{GTSAM_DIR}.${ColourReset}")
 
     set(GTSAM_DIR ENV{GTSAM_DIR})
     find_package(GTSAM ${GTSAM_MIN_VERSION} CONFIG REQUIRED)
@@ -65,7 +65,7 @@ if (DEFINED ENV{GTSAM_DIR})
     )
 # 2 - Check whether GTSAM is installed -------------------------------------------------------
 elseif (GTSAM_FOUND)
-    message("${BoldMagenta}INFO: Found GTSAM installation.${ColourReset}")
+    message("${BoldMagenta}INFO: Found GTSAM installation at ${GTSAM_DIR}.${ColourReset}")
 
     find_package(GTSAM_UNSTABLE REQUIRED)
 
