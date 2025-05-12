@@ -11,7 +11,9 @@ find_package(catkin REQUIRED COMPONENTS
         )
 
 # Check whether gtsam can be found
-find_package(GTSAM QUIET)
+set(GTSAM_MIN_VERSION 4.2.0)
+set(GTSAM_TAG ${GTSAM_MIN_VERSION})
+find_package(GTSAM ${GTSAM_MIN_VERSION} QUIET)
 find_package(Eigen3 REQUIRED)
 
 # Color
@@ -47,7 +49,7 @@ if (DEFINED ENV{GTSAM_DIR})
     message("${BoldMagenta}INFO: Found manually set path to GTSAM. Using version located at $ENV{GTSAM_DIR}.${ColourReset}")
 
     set(GTSAM_DIR ENV{GTSAM_DIR})
-    find_package(GTSAM CONFIG REQUIRED)
+    find_package(GTSAM ${GTSAM_MIN_VERSION} CONFIG REQUIRED)
     message("GTSAM include path: ${GTSAM_INCLUDE_DIR}")
     message("GTSAM libs: ${GTSAM_LIBRARY_DIR}")
 
@@ -96,7 +98,7 @@ else ()
 
     ExternalProject_Add(GTSAM
         GIT_REPOSITORY "https://github.com/borglab/gtsam.git"
-        GIT_TAG "4.2a9"
+        GIT_TAG "${GTSAM_TAG}"
         GIT_PROGRESS "true"
         PREFIX      "${CMAKE_SOURCE_DIR}"
         TMP_DIR     "${CMAKE_BINARY_DIR}/gtsam/tmp"
