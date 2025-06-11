@@ -110,6 +110,7 @@ else ()
             -DGTSAM_USE_SYSTEM_EIGEN=ON
             -DGTSAM_BUILD_WITH_MARCH_NATIVE=OFF
             -DCMAKE_INSTALL_PREFIX=${CATKIN_DEVEL_PREFIX}
+            -DGTSAM_WITH_TBB=OFF
             INSTALL_COMMAND make install
             )
 
