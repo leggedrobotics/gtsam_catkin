@@ -47,8 +47,7 @@ if (DEFINED ENV{GTSAM_DIR})
 
     set(GTSAM_DIR ENV{GTSAM_DIR})
     find_package(GTSAM ${GTSAM_MIN_VERSION} CONFIG REQUIRED)
-    message("GTSAM include path: ${GTSAM_INCLUDE_DIR}")
-    message("GTSAM libs: ${GTSAM_LIBRARY_DIR}")
+    find_package(GTSAM_UNSTABLE REQUIRED)
 
     catkin_package(
         INCLUDE_DIRS
