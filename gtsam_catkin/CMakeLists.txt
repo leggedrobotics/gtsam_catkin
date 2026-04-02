@@ -1,6 +1,10 @@
 cmake_minimum_required(VERSION 3.16)
 project(gtsam_catkin)
 
+option(GTSAM_CATKIN_FORCE_LOCAL_GTSAM
+        "Force building GTSAM in the catkin workspace instead of using an existing installation"
+        ON)
+
 find_package(catkin REQUIRED)
 
 set(CATKIN_PACKAGE_DEPENDENCIES
@@ -10,8 +14,11 @@ find_package(catkin REQUIRED COMPONENTS
         ${CATKIN_PACKAGE_DEPENDENCIES}
         )
 
-# Check whether gtsam can be found
-find_package(GTSAM QUIET)
+# Check whether gtsam can be found unless local workspace build is forced
+if (NOT GTSAM_CATKIN_FORCE_LOCAL_GTSAM)
+    find_package(GTSAM QUIET)
+endif ()
+
 find_package(Eigen3 REQUIRED)
 
 # Color
@@ -42,8 +49,14 @@ get_run_deps(INCLUDE_DIRS ${CATKIN_DEVEL_PREFIX}/include
         LIBRARIES tbb
         )
 
-# 1 - Check whether variable is set -----------------------------------------------------------
-if (DEFINED ENV{GTSAM_DIR})
+set(USE_LOCAL_GTSAM FALSE)
+
+# Select GTSAM source -------------------------------------------------------------------------
+if (GTSAM_CATKIN_FORCE_LOCAL_GTSAM)
+    set(USE_LOCAL_GTSAM TRUE)
+    set(GTSAM_LOCAL_BUILD_REASON
+            "GTSAM_CATKIN_FORCE_LOCAL_GTSAM is enabled, hence compiling GTSAM in workspace.")
+elseif (DEFINED ENV{GTSAM_DIR})
     message("${BoldMagenta}INFO: Found manually set path to GTSAM. Using version located at $ENV{GTSAM_DIR}.${ColourReset}")
 
     set(GTSAM_DIR ENV{GTSAM_DIR})
@@ -60,7 +73,7 @@ if (DEFINED ENV{GTSAM_DIR})
             ${CS_PROJECT_LIBRARIES}
     )
 
-    # 2 - Check whether GTSAM is installed -------------------------------------------------------
+    # 2 - Check whether GTSAM is installed ------------------------------------------------------
 elseif (GTSAM_FOUND)
     message("${BoldMagenta}INFO: Found GTSAM installation.${ColourReset}")
 
@@ -83,9 +96,16 @@ elseif (GTSAM_FOUND)
 #        set(GTSAM_INCLUDE_DIR_MAN "${GTSAM_DIR}/../../../include/")
 #    endif ()
 
-    # 3 - Compile in catkin workspace -------------------------------------------------------------
+    # 3 - Compile in catkin workspace ------------------------------------------------------------
 else ()
-    message("${BoldMagenta}INFO: Neither variable GTSAM_DIR is set, nor could GTSAM be found, hence compiling in workspace.${ColourReset}")
+    set(USE_LOCAL_GTSAM TRUE)
+    set(GTSAM_LOCAL_BUILD_REASON
+            "Neither variable GTSAM_DIR is set, nor could GTSAM be found, hence compiling in workspace.")
+
+endif ()
+
+if (USE_LOCAL_GTSAM)
+    message("${BoldMagenta}INFO: ${GTSAM_LOCAL_BUILD_REASON}${ColourReset}")
 
     # Newer version of CMake is required
     # cmake_minimum_required(VERSION 3.18)
@@ -94,9 +114,12 @@ else ()
     include(ExternalProject)
     file(MAKE_DIRECTORY ${CATKIN_DEVEL_PREFIX}/include)
 
+    set(GTSAM_VERSION "6ec49ac5de01fe5cf384069ac8d40cfebef40147")
+
     ExternalProject_Add(GTSAM
             GIT_REPOSITORY "https://github.com/borglab/gtsam.git"
-            GIT_TAG "4.2a9"
+            # ExternalProject_Add uses GIT_TAG for tags, branches, or commit hashes.
+            GIT_TAG "${GTSAM_VERSION}"
             GIT_PROGRESS "true"
             CMAKE_CACHE_ARGS "-DCMAKE_POSITION_INDEPENDENT_CODE:BOOL=true"
             PREFIX "${CMAKE_BINARY_DIR}/gtsam_external"
@@ -142,5 +165,4 @@ else ()
             ${${PROJECT_NAME}_CATKIN_RUN_DEPENDS}
             ${CATKIN_PACKAGE_DEPENDENCIES}
     )
-
 endif ()
