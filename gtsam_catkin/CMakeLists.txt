@@ -3,7 +3,7 @@ project(gtsam_catkin)
 
 option(GTSAM_CATKIN_FORCE_LOCAL_GTSAM
         "Force building GTSAM in the catkin workspace instead of using an existing installation"
-        ON)
+        OFF)
 
 find_package(catkin REQUIRED)
 
