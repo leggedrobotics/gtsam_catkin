@@ -29,6 +29,31 @@ if (NOT WIN32)
     set(Magenta "${Esc}[35m")
 endif ()
 
+macro(resolve_gtsam_install_paths)
+    if (NOT GTSAM_DIR)
+        message(FATAL_ERROR "GTSAM_DIR is not set, cannot resolve GTSAM install paths.")
+    endif ()
+
+    get_filename_component(_GTSAM_CONFIG_DIR "${GTSAM_DIR}" ABSOLUTE)
+    get_filename_component(_GTSAM_INSTALL_PREFIX "${_GTSAM_CONFIG_DIR}/../../.." ABSOLUTE)
+
+    if (NOT GTSAM_INCLUDE_DIR OR NOT EXISTS "${GTSAM_INCLUDE_DIR}/gtsam")
+        set(GTSAM_INCLUDE_DIR "${_GTSAM_INSTALL_PREFIX}/include")
+    endif ()
+
+    if (NOT GTSAM_LIBRARY_DIR OR NOT EXISTS "${GTSAM_LIBRARY_DIR}/libgtsam.so")
+        set(GTSAM_LIBRARY_DIR "${_GTSAM_INSTALL_PREFIX}/lib")
+    endif ()
+
+    if (NOT EXISTS "${GTSAM_LIBRARY_DIR}/libgtsam.so")
+        message(FATAL_ERROR "Could not find libgtsam.so under ${GTSAM_LIBRARY_DIR}.")
+    endif ()
+
+    if (NOT EXISTS "${GTSAM_LIBRARY_DIR}/libgtsam_unstable.so")
+        message(FATAL_ERROR "Could not find libgtsam_unstable.so under ${GTSAM_LIBRARY_DIR}.")
+    endif ()
+endmacro()
+
 # Code snippet taken from catkin_simple: https://github.com/catkin/catkin_simple/blob/master/cmake/catkin_simple-extras.cmake.em
 macro(get_run_deps)
     cmake_parse_arguments(CS_PROJECT
@@ -59,8 +84,9 @@ if (GTSAM_CATKIN_FORCE_LOCAL_GTSAM)
 elseif (DEFINED ENV{GTSAM_DIR})
     message("${BoldMagenta}INFO: Found manually set path to GTSAM. Using version located at $ENV{GTSAM_DIR}.${ColourReset}")
 
-    set(GTSAM_DIR ENV{GTSAM_DIR})
+    set(GTSAM_DIR "$ENV{GTSAM_DIR}")
     find_package(GTSAM CONFIG REQUIRED)
+    resolve_gtsam_install_paths()
     message("GTSAM include path: ${GTSAM_INCLUDE_DIR}")
     message("GTSAM libs: ${GTSAM_LIBRARY_DIR}")
 
@@ -69,7 +95,8 @@ elseif (DEFINED ENV{GTSAM_DIR})
             DEPENDS GTSAM
             INCLUDE_DIRS ${GTSAM_INCLUDE_DIR}
             LIBRARIES
-            gtsam gtsam_unstable
+            ${GTSAM_LIBRARY_DIR}/libgtsam.so
+            ${GTSAM_LIBRARY_DIR}/libgtsam_unstable.so
             ${CS_PROJECT_LIBRARIES}
     )
 
@@ -77,6 +104,7 @@ elseif (DEFINED ENV{GTSAM_DIR})
 elseif (GTSAM_FOUND)
     message("${BoldMagenta}INFO: Found GTSAM installation.${ColourReset}")
 
+    resolve_gtsam_install_paths()
     message("GTSAM include path: ${GTSAM_INCLUDE_DIR}")
     message("GTSAM libs: ${GTSAM_LIBRARY_DIR}")
 
@@ -85,7 +113,8 @@ elseif (GTSAM_FOUND)
             DEPENDS GTSAM
             INCLUDE_DIRS ${GTSAM_INCLUDE_DIR}
             LIBRARIES
-            gtsam gtsam_unstable
+            ${GTSAM_LIBRARY_DIR}/libgtsam.so
+            ${GTSAM_LIBRARY_DIR}/libgtsam_unstable.so
             ${CS_PROJECT_LIBRARIES}
     )
 
