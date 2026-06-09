@@ -15,7 +15,7 @@ find_package(catkin REQUIRED COMPONENTS
         )
 
 # Check whether gtsam can be found unless local workspace build is forced
-if (NOT GTSAM_CATKIN_FORCE_LOCAL_GTSAM)
+if (NOT GTSAM_CATKIN_FORCE_LOCAL_GTSAM AND NOT DEFINED ENV{GTSAM_DIR})
     find_package(GTSAM QUIET)
 endif ()
 
